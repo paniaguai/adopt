@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐱 PurrPaths — Global Cat Adoption Directory</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #faf6f0;
+    --warm-white: #fff9f2;
+    --amber: #e8883a;
+    --amber-light: #f5a55c;
+    --amber-dark: #c0622a;
+    --sienna: #7a3b1e;
+    --charcoal: #2b2118;
+    --text: #3d2b1f;
+    --text-light: #7a5c48;
+    --card-bg: #fffcf8;
+    --border: #e8ddd3;
+    --shadow: rgba(120, 60, 30, 0.12);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    background: var(--charcoal);
+    position: relative;
+    padding: 80px 40px 90px;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 30% 50%, #7a3b1e55 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, #e8883a33 0%, transparent 55%);
+  }
+  .hero-paws {
+    position: absolute;
+    font-size: 120px;
+    opacity: 0.04;
+    user-select: none;
+    pointer-events: none;
+  }
+  .hero-paws.p1 { top: -20px; left: -20px; transform: rotate(-15deg); }
+  .hero-paws.p2 { bottom: -30px; right: 5%; transform: rotate(20deg); font-size: 180px; }
+  .hero-paws.p3 { top: 10px; right: 30%; transform: rotate(5deg); font-size: 80px; }
+
+  .hero-eyebrow {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--amber-light);
+    font-size: 0.75rem;
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    padding: 6px 18px;
+    border: 1px solid var(--amber-light);
+    border-radius: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 0.95;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 16px;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--amber);
+  }
+  .hero-sub {
+    font-weight: 300;
+    font-size: 1.05rem;
+    color: #b09a8e;
+    position: relative;
+    z-index: 1;
+    margin-bottom: 36px;
+    max-width: 460px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    position: relative;
+    z-index: 1;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--amber);
+    display: block;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    color: #8a7068;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  /* SEARCH */
+  .search-bar {
+    background: var(--warm-white);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 40px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px var(--shadow);
+    flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 18px;
+    border: 1.5px solid var(--border);
+    border-radius: 30px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    background: var(--cream);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--amber); }
+  .search-input::placeholder { color: var(--text-light); }
+  .filter-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    background: var(--amber);
+    border-color: var(--amber);
+    color: white;
+  }
+
+  /* MAIN CONTENT */
+  .main { max-width: 1300px; margin: 0 auto; padding: 50px 30px; }
+
+  .country-section {
+    margin-bottom: 56px;
+    animation: fadeUp 0.5s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .country-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+  .country-flag { font-size: 2rem; }
+  .country-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--charcoal);
+  }
+  .country-count {
+    margin-left: auto;
+    background: var(--amber);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 4px 12px;
+    border-radius: 12px;
+    letter-spacing: 0.05em;
+  }
+
+  .shelters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+
+  .shelter-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .shelter-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--amber), var(--amber-light));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .shelter-card:hover {
+    border-color: var(--amber-light);
+    box-shadow: 0 6px 24px var(--shadow);
+    transform: translateY(-2px);
+  }
+  .shelter-card:hover::before { opacity: 1; }
+
+  .shelter-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--charcoal);
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+  .shelter-city {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .shelter-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: var(--amber-dark);
+    font-size: 0.82rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .shelter-link:hover { color: var(--amber); }
+  .shelter-link svg { width: 12px; height: 12px; }
+
+  .paw-tag {
+    position: absolute;
+    bottom: 14px;
+    right: 16px;
+    font-size: 1.1rem;
+    opacity: 0.18;
+  }
+
+  /* NO RESULTS */
+  .no-results {
+    text-align: center;
+    padding: 80px 20px;
+    display: none;
+  }
+  .no-results.visible { display: block; }
+  .no-results p {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--text-light);
+  }
+
+  /* FOOTER */
+  footer {
+    background: var(--charcoal);
+    color: #8a7068;
+    text-align: center;
+    padding: 36px 20px;
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+  }
+  footer span { color: var(--amber); }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .hero { padding: 60px 20px 70px; }
+    .search-bar { padding: 16px 20px; }
+    .main { padding: 30px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-paws p1">🐾</div>
+  <div class="hero-paws p2">🐾</div>
+  <div class="hero-paws p3">🐾</div>
+  <div class="hero-eyebrow">Global Cat Adoption Directory</div>
+  <h1>Find Your<br><em>Purr-fect</em><br>Match</h1>
+  <p class="hero-sub">100 verified cat adoption shelters across the world — because every cat deserves a loving home.</p>
+  <div class="stats-row">
+    <div class="stat"><span class="stat-num">100</span><span class="stat-label">Shelters</span></div>
+    <div class="stat"><span class="stat-num">15</span><span class="stat-label">Countries</span></div>
+    <div class="stat"><span class="stat-num">∞</span><span class="stat-label">Cats to Love</span></div>
+  </div>
+</div>
+
+<div class="search-bar">
+  <input type="text" class="search-input" id="searchInput" placeholder="🔍  Search shelters or cities…" oninput="filterShelters()">
+  <div class="filter-btns" id="filterBtns"></div>
+</div>
+
+<main class="main" id="main"></main>
+<div class="no-results" id="noResults"><p>😿 No shelters found. Try a different search!</p></div>
+
+<footer>
+  Made with <span>♥</span> for cats everywhere · PurrPaths 2025 · Links lead to external shelter websites
+</footer>
+
+<script>
+const data = [
+  {
+    country: "🇺🇸 United States", tag: "USA",
+    shelters: [
+      { name: "ASPCA", city: "New York, NY", url: "https://www.aspca.org" },
+      { name: "Best Friends Animal Society", city: "Kanab, UT", url: "https://bestfriends.org" },
+      { name: "Humane Society of the US", city: "Washington, DC", url: "https://www.humanesociety.org" },
+      { name: "North Shore Animal League", city: "Port Washington, NY", url: "https://www.nsalamerica.org" },
+      { name: "SF SPCA", city: "San Francisco, CA", url: "https://www.sfspca.org" },
+      { name: "Lange Foundation", city: "Los Angeles, CA", url: "https://www.langefoundation.org" },
+      { name: "Chicago Anti-Cruelty Society", city: "Chicago, IL", url: "https://anticruelty.org" },
+      { name: "Austin Pets Alive!", city: "Austin, TX", url: "https://www.austinpetsalive.org" },
+      { name: "Seattle Humane", city: "Bellevue, WA", url: "https://www.seattlehumane.org" },
+      { name: "Denver Dumb Friends League", city: "Denver, CO", url: "https://www.ddfl.org" },
+    ]
+  },
+  {
+    country: "🇬🇧 United Kingdom", tag: "UK",
+    shelters: [
+      { name: "Cats Protection", city: "Chelwood Gate, England", url: "https://www.cats.org.uk" },
+      { name: "RSPCA", city: "Horsham, England", url: "https://www.rspca.org.uk" },
+      { name: "Blue Cross", city: "Burford, England", url: "https://www.bluecross.org.uk" },
+      { name: "Battersea Dogs & Cats Home", city: "London, England", url: "https://www.battersea.org.uk" },
+      { name: "PDSA", city: "Telford, England", url: "https://www.pdsa.org.uk" },
+      { name: "Scottish SPCA", city: "Edinburgh, Scotland", url: "https://www.scottishspca.org" },
+      { name: "Wood Green Animal Shelters", city: "Godmanchester, England", url: "https://www.woodgreen.org.uk" },
+      { name: "Mayhew Animal Home", city: "London, England", url: "https://www.themayhew.org" },
+    ]
+  },
+  {
+    country: "🇨🇦 Canada", tag: "Canada",
+    shelters: [
+      { name: "BC SPCA", city: "Vancouver, BC", url: "https://www.spca.bc.ca" },
+      { name: "Toronto Humane Society", city: "Toronto, ON", url: "https://www.torontohumanesociety.com" },
+      { name: "Ottawa Humane Society", city: "Ottawa, ON", url: "https://www.ottawahumane.ca" },
+      { name: "Montreal SPCA", city: "Montreal, QC", url: "https://www.spca.com" },
+      { name: "Alberta Animal Rescue Crew Society", city: "Calgary, AB", url: "https://www.albertaanimalsociety.com" },
+      { name: "Nova Scotia SPCA", city: "Dartmouth, NS", url: "https://www.nsspca.ca" },
+      { name: "Calgary Humane Society", city: "Calgary, AB", url: "https://www.calgaryhumane.ca" },
+    ]
+  },
+  {
+    country: "🇦🇺 Australia", tag: "Australia",
+    shelters: [
+      { name: "RSPCA Australia", city: "Deakin, ACT", url: "https://www.rspca.org.au" },
+      { name: "Animal Welfare League NSW", city: "Sydney, NSW", url: "https://www.awlnsw.com.au" },
+      { name: "Lost Dogs' Home", city: "Melbourne, VIC", url: "https://www.lostdogshome.org" },
+      { name: "Cat Haven", city: "Perth, WA", url: "https://www.cathaven.com.au" },
+      { name: "Animal Welfare League QLD", city: "Brisbane, QLD", url: "https://www.awlq.org" },
+      { name: "PetRescue", city: "Geelong, VIC", url: "https://www.petrescue.com.au" },
+      { name: "SA Animal Welfare League", city: "Adelaide, SA", url: "https://www.awl.org.au" },
+    ]
+  },
+  {
+    country: "🇩🇪 Germany", tag: "Germany",
+    shelters: [
+      { name: "Tierschutzverein München", city: "Munich", url: "https://www.tierschutzverein-muenchen.de" },
+      { name: "Berliner Tierheim", city: "Berlin", url: "https://www.tierheim-berlin.de" },
+      { name: "Tierschutz Hamburg", city: "Hamburg", url: "https://www.tierschutz-hamburg.de" },
+      { name: "Tierheim Frankfurt", city: "Frankfurt", url: "https://www.tierheim-frankfurt.de" },
+      { name: "Tierschutzverein Köln", city: "Cologne", url: "https://www.tierheim-koeln.de" },
+      { name: "Tierschutzverein Nürnberg", city: "Nuremberg", url: "https://www.tierschutzverein-nuernberg.de" },
+    ]
+  },
+  {
+    country: "🇫🇷 France", tag: "France",
+    shelters: [
+      { name: "SPA de Paris", city: "Paris", url: "https://www.la-spa.fr" },
+      { name: "Fondation 30 Millions d'Amis", city: "Paris", url: "https://www.30millionsdamis.fr" },
+      { name: "Chat'erelle", city: "Lyon", url: "https://www.chaterelle.org" },
+      { name: "SPA Île-de-France", city: "Gennevilliers", url: "https://www.spa.asso.fr" },
+      { name: "Les Chats du Bonheur", city: "Marseille", url: "https://www.leschatsdu bonheur.fr" },
+      { name: "Chats Libres Bordeaux", city: "Bordeaux", url: "https://www.chatslibresbordeaux.fr" },
+    ]
+  },
+  {
+    country: "🇯🇵 Japan", tag: "Japan",
+    shelters: [
+      { name: "Japan Cat Network", city: "Osaka", url: "https://www.japancatnetwork.com" },
+      { name: "Tokyo Cat Guardians", city: "Tokyo", url: "https://www.tokyocatguardians.com" },
+      { name: "Neko Café Adoption (ARK)", city: "Osaka", url: "https://www.arkbark.net" },
+      { name: "Kyoto Animal Welfare", city: "Kyoto", url: "https://www.kyoto-awa.jp" },
+      { name: "Sunshine Kitty Tokyo", city: "Tokyo", url: "https://www.sunshinekitty.jp" },
+      { name: "Yokohama Animal Protection Center", city: "Yokohama", url: "https://www.city.yokohama.lg.jp/kurashi/dobutsu" },
+    ]
+  },
+  {
+    country: "🇳🇱 Netherlands", tag: "Netherlands",
+    shelters: [
+      { name: "Dierenbescherming", city: "The Hague", url: "https://www.dierenbescherming.nl" },
+      { name: "Dierenasiel Amsterdam", city: "Amsterdam", url: "https://www.dierenasielpurmerend.nl" },
+      { name: "Asiel Rotterdam", city: "Rotterdam", url: "https://www.asiellorentz.nl" },
+      { name: "Stichting De Poezenboot", city: "Amsterdam", url: "https://www.poezenboot.nl" },
+      { name: "Dierenopvangcentrum Utrecht", city: "Utrecht", url: "https://www.doc-utrecht.nl" },
+    ]
+  },
+  {
+    country: "🇮🇹 Italy", tag: "Italy",
+    shelters: [
+      { name: "Lega del Cane Roma", city: "Rome", url: "https://www.legadelcane.org" },
+      { name: "ENPA Milano", city: "Milan", url: "https://www.enpamilano.org" },
+      { name: "Rifugio del Gatto", city: "Turin", url: "https://www.rifugiodelgatto.it" },
+      { name: "Gatti Liberi Firenze", city: "Florence", url: "https://www.gattiliberifirenze.it" },
+      { name: "LAV Italia", city: "Rome", url: "https://www.lav.it" },
+    ]
+  },
+  {
+    country: "🇪🇸 Spain", tag: "Spain",
+    shelters: [
+      { name: "FAADA", city: "Barcelona", url: "https://www.faada.org" },
+      { name: "Asociación Felina de Madrid", city: "Madrid", url: "https://www.asociacionfemad.es" },
+      { name: "Gata Salvaje", city: "Barcelona", url: "https://www.gatasalvaje.org" },
+      { name: "SOS Gatos", city: "Madrid", url: "https://www.sosgatos.org" },
+      { name: "Adopta un Gato Valencia", city: "Valencia", url: "https://www.adoptaungatovalencia.com" },
+    ]
+  },
+  {
+    country: "🇳🇿 New Zealand", tag: "NZ",
+    shelters: [
+      { name: "SPCA New Zealand", city: "Auckland", url: "https://www.spca.nz" },
+      { name: "Cats Protection League NZ", city: "Wellington", url: "https://www.catsprotection.org.nz" },
+      { name: "Wellington SPCA", city: "Wellington", url: "https://www.wellingtonspca.org.nz" },
+      { name: "HUHA NZ", city: "Kāpiti Coast", url: "https://www.huha.org.nz" },
+      { name: "Animal Rescue Network NZ", city: "Christchurch", url: "https://www.animalrescuenetwork.org.nz" },
+    ]
+  },
+  {
+    country: "🇿🇦 South Africa", tag: "South Africa",
+    shelters: [
+      { name: "SPCA South Africa", city: "Johannesburg", url: "https://www.spca.co.za" },
+      { name: "Cape of Good Hope SPCA", city: "Cape Town", url: "https://www.coghspca.co.za" },
+      { name: "Durban & Coast SPCA", city: "Durban", url: "https://www.durbanspca.co.za" },
+      { name: "Kitty & Puppy Haven", city: "Johannesburg", url: "https://www.kittyandpuppyhaven.co.za" },
+      { name: "Animal Welfare Society SA", city: "Cape Town", url: "https://www.awssa.org.za" },
+    ]
+  },
+  {
+    country: "🇧🇷 Brazil", tag: "Brazil",
+    shelters: [
+      { name: "Instituto Luisa Mell", city: "São Paulo", url: "https://www.institutolouisamell.org.br" },
+      { name: "ANDA — Animal News Agency", city: "São Paulo", url: "https://www.anda.jor.br" },
+      { name: "ONG Anjos dos Animais", city: "Rio de Janeiro", url: "https://www.anjosespeciais.com.br" },
+      { name: "Projeto Gato Livre", city: "Belo Horizonte", url: "https://www.gatoslivres.org.br" },
+      { name: "Cão & Cia SP", city: "São Paulo", url: "https://www.caoeciabrasil.com.br" },
+    ]
+  },
+  {
+    country: "🇮🇳 India", tag: "India",
+    shelters: [
+      { name: "PETA India", city: "Mumbai", url: "https://www.petaindia.com" },
+      { name: "Humane Society International India", city: "New Delhi", url: "https://www.hsi.org/world-animal-protection" },
+      { name: "Friendicoes SECA", city: "New Delhi", url: "https://www.friendicoes.org" },
+      { name: "Welfare of Stray Dogs", city: "Mumbai", url: "https://www.wsd.ngo" },
+      { name: "Cats of India Rescue", city: "Bangalore", url: "https://www.catsofindia.com" },
+    ]
+  },
+  {
+    country: "🇸🇬 Singapore", tag: "Singapore",
+    shelters: [
+      { name: "SPCA Singapore", city: "Singapore", url: "https://www.spca.org.sg" },
+      { name: "Cat Welfare Society", city: "Singapore", url: "https://www.catwelfare.org" },
+      { name: "Exclusively Cats Vet Hospital & Shelter", city: "Singapore", url: "https://www.exclusivelycats.com.sg" },
+      { name: "Causes for Animals Singapore", city: "Singapore", url: "https://www.causesforanimals.com" },
+    ]
+  }
+];
+
+// Render
+function render(filteredData) {
+  const main = document.getElementById('main');
+  const noResults = document.getElementById('noResults');
+  main.innerHTML = '';
+  let totalVisible = 0;
+
+  filteredData.forEach((country, i) => {
+    if (country.shelters.length === 0) return;
+    totalVisible += country.shelters.length;
+    const section = document.createElement('div');
+    section.className = 'country-section';
+    section.style.animationDelay = `${i * 0.06}s`;
+    section.innerHTML = `
+      <div class="country-header">
+        <span class="country-flag">${country.country.split(' ')[0]}</span>
+        <span class="country-name">${country.country.split(' ').slice(1).join(' ')}</span>
+        <span class="country-count">${country.shelters.length} shelter${country.shelters.length > 1 ? 's' : ''}</span>
+      </div>
+      <div class="shelters-grid">
+        ${country.shelters.map(s => `
+          <div class="shelter-card">
+            <div class="shelter-name">${s.name}</div>
+            <div class="shelter-city">📍 ${s.city}</div>
+            <a class="shelter-link" href="${s.url}" target="_blank" rel="noopener">
+              Visit Website
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 10L10 2M10 2H5M10 2V7"/>
+              </svg>
+            </a>
+            <span class="paw-tag">🐾</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    main.appendChild(section);
+  });
+
+  noResults.classList.toggle('visible', totalVisible === 0);
+}
+
+// Filter buttons
+const allTags = ['All', ...data.map(d => d.tag)];
+const filterBtns = document.getElementById('filterBtns');
+let activeTag = 'All';
+
+allTags.forEach(tag => {
+  const btn = document.createElement('button');
+  btn.className = 'filter-btn' + (tag === 'All' ? ' active' : '');
+  btn.textContent = tag;
+  btn.onclick = () => {
+    activeTag = tag;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    filterShelters();
+  };
+  filterBtns.appendChild(btn);
+});
+
+function filterShelters() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = data.map(country => ({
+    ...country,
+    shelters: country.shelters.filter(s =>
+      (activeTag === 'All' || country.tag === activeTag) &&
+      (s.name.toLowerCase().includes(q) || s.city.toLowerCase().includes(q) || country.country.toLowerCase().includes(q))
+    )
+  })).filter(c => c.shelters.length > 0 || (activeTag !== 'All' && c.tag === activeTag));
+
+  render(filtered);
+}
+
+render(data);
+</script>
+</body>
+</html>
